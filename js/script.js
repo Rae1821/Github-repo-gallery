@@ -8,6 +8,11 @@ const repoList = document.querySelector(".repo-list");
 const repoSection = document.querySelector(".repos");
 //Targeting the section where the individual repo data will appear
 const repoData = document.querySelector(".repo-data");
+//Targeting the back to repo gallery button
+const backButton = document.querySelector(".view-repos");
+//Targeting the input with the "search by name" placeholder
+const filterInput = document.querySelector(".filter-repos");
+
 
 
 //Async function to fetch info from github profile
@@ -22,15 +27,15 @@ profileInfo();
 //Fetch & Display User Information
 const userData = function(data) {
     const userInfo = document.createElement("div");
-    userInfo.classList.add(".user-info");
+    userInfo.classList.add("user-info");
     userInfo.innerHTML = 
     `<figure>
-    <img alt="user avatar" src=${data.avatar_url} />
+        <img alt="user avatar" src=${data.avatar_url} />
     </figure>
     <div>
         <p><strong>Name:</strong> ${data.name}</p>
         <p><strong>Bio:</strong> ${data.bio}</p>
-        <p><strong>Location</strong> ${data.location}</p>
+        <p><strong>Location:</strong> ${data.location}</p>
         <p><strong>Number of public repos:</strong> ${data.public_repos}</p>
     </div>`;
     profile.append(userInfo);
@@ -47,10 +52,11 @@ const fetchRepos = async function() {
 
 //Function to display info about your repos
 const displayRepos = function(repos) {
-    for(const list of repos) {
+    filterInput.classList.remove("hide");
+    for(const repo of repos) {
        const li = document.createElement("li");
-       li.classList.add(".repo");
-       li.innerHTML = `<h3>${list.name}</h3>`;
+       li.classList.add("repo");
+       li.innerHTML = `<h3>${repo.name}</h3>`;
        repoList.append(li);
     }
 };
@@ -86,7 +92,10 @@ const specificRepoInfo = async function (repoName) {
 
 //Function to display specific repo info
 const displayRepoInfo = function (repoInfo, languages) {
+    backButton.classList.remove("hide");
     repoData.innerHTML = "";
+    repoData.classList.remove("hide");
+    repoSection.classList.add("hide");
     const repoDiv = document.createElement("div");
     repoDiv.innerHTML = 
         `<h3>Name: ${repoInfo.name}</h3>
@@ -95,6 +104,29 @@ const displayRepoInfo = function (repoInfo, languages) {
             <p>Languages: ${languages.join(", ")}</p>
             <a class="visit" href="${repoInfo.html_url}" target="_blank" rel="noreferrer noopener">View Repo on Github!</a>`
     repoData.append(repoDiv);
-    repoData.classList.remove("hide");
-    repoSection.classList.add("hide");
  };
+
+
+ //Click event for the back button
+ backButton.addEventListener("click", function () {
+    repoSection.classList.remove("hide");
+    repoData.classList.add("hide");
+    backButton.classList.add("hide");
+
+ });
+
+ //Add an input event to the search box
+ filterInput.addEventListener("input", function(e) {
+     const inputValue = e.target.value;
+     const repos = document.querySelectorAll(".repo");
+     const searchLowerText = inputValue.toLowerCase();
+ 
+     for(const repo of repos) {
+        const repoLowerText = repo.innerText.toLowerCase();
+         if (repoLowerText.includes(searchLowerText)) {
+             repo.classList.remove("hide");
+         } else {
+             repo.classList.add("hide");
+         }
+     }
+ });
